@@ -193,19 +193,21 @@
 export default {
   data() {
     return {
-      tableData: [],
-      page_num:4,
-      page_size:10,
-      pages:[{page:"",list:[]},{page:"",list:[]},{page:"",list:[]},{page:"",list:[]}],
-      algo:"FIFO",
+      tableData: [],//右侧表格中数据
+      page_num:4,//内存中共有4个页面
+      page_size:10,//每个页面共有十个块
+      all_step:320,//共有320步操作
+      pages:[{page:"",list:[]},{page:"",list:[]},{page:"",list:[]},{page:"",list:[]}],//每个内存页面
+      algo:"FIFO",//当前所执行算法  
+      miss_page:"0",//缺页数
+      miss_page_rate:"0%",//缺页率
+      cur_step:0,//当前步数
+      fifo:[0,1,2,3],//FIFO算法初始化数组
+      lru:["","","",""],//LRU算法初始化数组
+      percent:0,//当前执行进度
+      
+      //界面实现
       button_name:"连续执行",
-      miss_page:"0",
-      miss_page_rate:"0%",
-      cur_step:0,
-      all_step:320,
-      fifo:[0,1,2,3],
-      lru:["","","",""],
-      percent:0,
       page_style:["","","",""],
       li_style:[],
       is_disabled:false,
@@ -214,31 +216,12 @@ export default {
     };
   },
   methods:{
-    customColorMethod(percentage) {
-        if (percentage < 30) {
-          return '#909399';
-        } else if (percentage < 70) {
-          return '#e6a23c';
-        } else {
-          return '#67c23a';
-        }
-    },
-    getNextAddress:function(){
-      var probability=Math.random();
-      if(probability<0.5){
-        return this.cur_step+1;
-      }
-      else if(probability>=0.5 && probability<0.75){
-        return Math.floor(Math.random()*160)+1;
-      }
-      else if(probability>=0.75){
-        return Math.floor(Math.random()*160)+161;
-      }
-    },
+    //算法改变
     algoChanged:function(index){
       if(this.algo!=index) return true;
       return false;
     },
+    //选择算法
     selectAlgorithm:function(index,index_path){
       if(index==="FIFO"){
         if(this.algoChanged(index)){
@@ -255,49 +238,7 @@ export default {
         console.log("LRU-processing");
       }
     },
-    reset:function(){
-      for(var i=0;i<this.page_num;i++){
-        this.pages[i].page="";
-        this.pages[i].list=[];
-      }
-      this.button_name="连续执行";
-      this.miss_page="0";
-      this.miss_page_rate="0%";
-      this.cur_step=0;
-      this.page_style=["","","",""];
-      this.tableData=[];
-      this.button_name="连续执行";
-      this.fifo=[0,1,2,3];
-      this.lru=["","","",""];
-      this.percent=0;
-      this.is_disabled=false;
-      this.is_muti=false;
-      this.li_style=[];
-      clearInterval(this.interval);
-    },
-    FIFO:function(){
-      var p=this.fifo.shift();
-      this.fifo.push(p);
-      return p;
-    },
-    LRU:function(){
-      var temp=0;
-      for(var i=0;i<this.page_num;i++){
-        if(this.lru[i]<this.lru[temp]){
-          temp=i;
-        }
-      }
-      return temp;
-    },
-    resetPage(){
-      this.li_style=[];
-      for(var i=0;i<this.page_num;i++){
-        this.$set(this.page_style,i,{background : ''});
-      }
-      for(var i=0;i<this.all_step;i++){
-          this.li_style.push("");
-      }
-    },
+    //单步执行
     singleStep:function(){
       console.log(this.li_style[0]);
       this.resetPage();
@@ -359,6 +300,7 @@ export default {
 
       this.percent=this.tableData.length*100/this.all_step;
     },
+    //多步执行
     multiStep:function(){
       if(this.tableData.length==this.all_step){
         clearInterval(this.interval);
@@ -379,6 +321,23 @@ export default {
         clearInterval(this.interval);
       }
     },
+    //维护FIFO数组
+    FIFO:function(){
+      var p=this.fifo.shift();
+      this.fifo.push(p);
+      return p;
+    },
+    //维护LRU数组
+    LRU:function(){
+      var temp=0;
+      for(var i=0;i<this.page_num;i++){
+        if(this.lru[i]<this.lru[temp]){
+          temp=i;
+        }
+      }
+      return temp;
+    },
+    //页面是否在内存中
     isInPages:function(next_step){
       for(var i=0;i<this.page_num;i++){
         if(this.pages[i].page==="") continue;
@@ -387,7 +346,61 @@ export default {
         }
       }
       return -1;
-    }
+    },
+    //获得下一个地址
+    getNextAddress:function(){
+      var probability=Math.random();
+      if(probability<0.5){
+        return this.cur_step+1;
+      }
+      else if(probability>=0.5 && probability<0.75){
+        return Math.floor(Math.random()*160)+1;
+      }
+      else if(probability>=0.75){
+        return Math.floor(Math.random()*160)+161;
+      }
+    },
+    //重置
+    reset:function(){
+      for(var i=0;i<this.page_num;i++){
+        this.pages[i].page="";
+        this.pages[i].list=[];
+      }
+      this.button_name="连续执行";
+      this.miss_page="0";
+      this.miss_page_rate="0%";
+      this.cur_step=0;
+      this.page_style=["","","",""];
+      this.tableData=[];
+      this.button_name="连续执行";
+      this.fifo=[0,1,2,3];
+      this.lru=["","","",""];
+      this.percent=0;
+      this.is_disabled=false;
+      this.is_muti=false;
+      this.li_style=[];
+      clearInterval(this.interval);
+    },
+    //页面重置
+    resetPage(){
+      this.li_style=[];
+      for(var i=0;i<this.page_num;i++){
+        this.$set(this.page_style,i,{background : ''});
+      }
+      for(var i=0;i<this.all_step;i++){
+          this.li_style.push("");
+      }
+    },
+    //进度条颜色实现
+    customColorMethod(percentage) {
+        if (percentage < 30) {
+          return '#909399';
+        } else if (percentage < 70) {
+          return '#e6a23c';
+        } else {
+          return '#67c23a';
+        }
+    },
   }
 };
 </script>
