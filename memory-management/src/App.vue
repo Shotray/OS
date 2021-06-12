@@ -273,6 +273,7 @@ export default {
       this.is_disabled=false;
       this.is_muti=false;
       this.li_style=[];
+      clearInterval(this.interval);
     },
     FIFO:function(){
       var p=this.fifo.shift();
