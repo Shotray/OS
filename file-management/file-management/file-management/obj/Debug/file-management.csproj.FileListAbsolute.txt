@@ -1,0 +1,11 @@
+D:\OS\file-management\file-management\file-management\bin\Debug\file-management.exe.config
+D:\OS\file-management\file-management\file-management\bin\Debug\file-management.exe
+D:\OS\file-management\file-management\file-management\bin\Debug\file-management.pdb
+D:\OS\file-management\file-management\file-management\obj\Debug\file-management.csprojAssemblyReference.cache
+D:\OS\file-management\file-management\file-management\obj\Debug\file_management.Form1.resources
+D:\OS\file-management\file-management\file-management\obj\Debug\file_management.Properties.Resources.resources
+D:\OS\file-management\file-management\file-management\obj\Debug\file-management.csproj.GenerateResource.cache
+D:\OS\file-management\file-management\file-management\obj\Debug\file-management.csproj.CoreCompileInputs.cache
+D:\OS\file-management\file-management\file-management\obj\Debug\file-management.exe
+D:\OS\file-management\file-management\file-management\obj\Debug\file-management.pdb
+D:\OS\file-management\file-management\file-management\obj\Debug\file_management.TXTFile.resources
