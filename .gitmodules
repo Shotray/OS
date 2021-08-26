@@ -1,0 +1,3 @@
+[submodule "lab/lab/util"]
+	path = lab/lab/util
+	url = git@github.com:Shotray/OS.git
